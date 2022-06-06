@@ -12,7 +12,7 @@ import (
 	_ "github.com/jackc/pgx/v4/stdlib"
 )
 
-func DbInit(cfg *config.Config) error {
+func DBInit(cfg *config.Config) error {
 
 	db, err := sql.Open("pgx", cfg.DataBase)
 	if err != nil {
@@ -186,6 +186,11 @@ func GetAccum(ctx context.Context, cfg config.Config, userID string) ([]config.O
 		return nil, err
 	}
 	defer rows.Close()
+	err = rows.Err()
+	if err != nil {
+		return nil, err
+	}
+
 	for rows.Next() {
 		var item config.OutAccum
 		err = rows.Scan(&item.Order, &item.Sum, &item.Date, item.Status)
@@ -242,6 +247,10 @@ func GetWithdrawals(ctx context.Context, cfg config.Config, userID string) ([]co
 		return nil, err
 	}
 	defer rows.Close()
+	err = rows.Err()
+	if err != nil {
+		return nil, err
+	}
 	for rows.Next() {
 		var item config.OutWithdrawals
 		err = rows.Scan(&item.Order, &item.Sum, &item.Date)
@@ -270,6 +279,10 @@ func GetOrdersProcessing(ctx context.Context, cfg config.Config) ([]string, erro
 		return nil, err
 	}
 	defer rows.Close()
+	err = rows.Err()
+	if err != nil {
+		return nil, err
+	}
 	for rows.Next() {
 		var item string
 		err = rows.Scan(&item)

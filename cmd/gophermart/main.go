@@ -26,7 +26,7 @@ func main() {
 	cfg := config.New()
 
 	// data base
-	if err := store.DbInit(&cfg); err != nil {
+	if err := store.DBInit(&cfg); err != nil {
 		log.Fatal(err)
 	}
 	defer cfg.ConnectDB.Close()
