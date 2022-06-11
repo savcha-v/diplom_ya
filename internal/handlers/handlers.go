@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 
 	"github.com/go-chi/chi/v5"
 )
@@ -36,6 +37,8 @@ func NewRouter(cfg config.Config) *chi.Mux {
 
 func userRegister(cfg config.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+
+		fmt.Fprintln(os.Stdout, "userRegister")
 
 		body, err := io.ReadAll(r.Body)
 		defer r.Body.Close()
@@ -83,6 +86,9 @@ func userRegister(cfg config.Config) http.HandlerFunc {
 
 func userLogin(cfg config.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+
+		fmt.Fprintln(os.Stdout, "userLogin")
+
 		body, err := io.ReadAll(r.Body)
 		defer r.Body.Close()
 		if err != nil {
@@ -122,6 +128,8 @@ func userLogin(cfg config.Config) http.HandlerFunc {
 
 func getBalance(cfg config.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+
+		fmt.Fprintln(os.Stdout, "getBalance")
 
 		type out struct {
 			Balanse  int `json:"current"`
@@ -164,6 +172,8 @@ func postOrder(cfg config.Config) http.HandlerFunc {
 		// 422 — неверный формат номера заказа;
 		// 500 — внутренняя ошибка сервера.
 
+		fmt.Fprintln(os.Stdout, "postOrder")
+
 		body, err := io.ReadAll(r.Body)
 		defer r.Body.Close()
 		if err != nil {
@@ -195,6 +205,8 @@ func postOrder(cfg config.Config) http.HandlerFunc {
 func getOrders(cfg config.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
+		fmt.Fprintln(os.Stdout, "getOrders")
+
 		userID := cookie.GetCookie(r, cfg, "userID")
 
 		valueOut, err := store.GetAccum(r.Context(), cfg, userID)
@@ -223,6 +235,8 @@ func getOrders(cfg config.Config) http.HandlerFunc {
 
 func postWithdraw(cfg config.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+
+		fmt.Fprintln(os.Stdout, "postWithdraw")
 
 		body, err := io.ReadAll(r.Body)
 		defer r.Body.Close()
@@ -261,6 +275,8 @@ func postWithdraw(cfg config.Config) http.HandlerFunc {
 
 func getWithdrawals(cfg config.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+
+		fmt.Fprintln(os.Stdout, "getWithdrawals")
 
 		userID := cookie.GetCookie(r, cfg, "userID")
 
