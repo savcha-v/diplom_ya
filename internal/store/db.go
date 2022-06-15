@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"diplom_ya/internal/config"
+	"diplom_ya/internal/workers"
 	"net/http"
 	"sync"
 	"time"
@@ -161,6 +162,9 @@ func AddOrder(ctx context.Context, cfg config.Config, order string, userID strin
 		if err != nil {
 			return http.StatusInternalServerError
 		}
+
+		workers.AddOrderToChannelProc(cfg, order)
+
 		return http.StatusAccepted
 	case err != nil:
 		return http.StatusInternalServerError
@@ -254,38 +258,6 @@ func GetWithdrawals(ctx context.Context, cfg config.Config, userID string) ([]co
 	for rows.Next() {
 		var item config.OutWithdrawals
 		err = rows.Scan(&item.Order, &item.Sum, &item.Date)
-		if err != nil {
-			return nil, err
-		}
-
-		out = append(out, item)
-	}
-
-	return out, err
-}
-
-func GetOrdersProcessing(ctx context.Context, cfg config.Config) ([]string, error) {
-
-	db := cfg.ConnectDB
-
-	textQuery := `SELECT "order"
-	FROM  accum 
-	where "status" = $1 or "status" = $2 or "status" = $3`
-
-	var out []string
-	// new, registered, processing
-	rows, err := db.QueryContext(ctx, textQuery, cfg.OrdersStatus.New, cfg.OrdersStatus.Processing, cfg.OrdersStatus.Registered)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	err = rows.Err()
-	if err != nil {
-		return nil, err
-	}
-	for rows.Next() {
-		var item string
-		err = rows.Scan(&item)
 		if err != nil {
 			return nil, err
 		}

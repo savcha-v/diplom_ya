@@ -207,6 +207,8 @@ func getOrders(cfg config.Config) http.HandlerFunc {
 
 		fmt.Fprintln(os.Stdout, "getOrders")
 
+		w.Header().Set("Content-Type", "application/json")
+
 		userID := cookie.GetCookie(r, cfg, "userID")
 
 		valueOut, err := store.GetAccum(r.Context(), cfg, userID)
@@ -226,7 +228,6 @@ func getOrders(cfg config.Config) http.HandlerFunc {
 			return
 		}
 
-		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		w.Write(result)
 		fmt.Fprint(w)

@@ -17,6 +17,7 @@ type Config struct {
 	Key            string
 	OrdersStatus
 	ChanOrdersProc chan string
+	RetryAfter     int
 }
 
 type OrdersStatus struct {
