@@ -39,10 +39,7 @@ func WriteOrderProcessing(ctx context.Context, cfg config.Config) {
 
 // обработать заказы из канала
 func ReadOrderProcessing(ctx context.Context, cfg config.Config) {
-	if cfg.RetryAfter != 0 {
-		time.Sleep(time.Duration(cfg.RetryAfter) * time.Second)
-		cfg.RetryAfter = 0
-	}
+
 	for number := range cfg.ChanOrdersProc {
 		orderData, err := getOrderData(ctx, cfg, number)
 		if err != nil {
@@ -84,10 +81,11 @@ func getOrderData(ctx context.Context, cfg config.Config, number string) (orderD
 	}
 
 	if r.StatusCode == http.StatusTooManyRequests {
-		cfg.RetryAfter, err = strconv.Atoi(r.Header.Get("Retry-After"))
+		retry, err := strconv.Atoi(r.Header.Get("Retry-After"))
 		if err != nil {
 			return valueIn, errors.New("error conv Retry-After /api/orders/")
 		}
+		time.Sleep(time.Duration(retry) * time.Second)
 	}
 
 	userID, err := getUserID(ctx, cfg, number)
@@ -97,6 +95,11 @@ func getOrderData(ctx context.Context, cfg config.Config, number string) (orderD
 	}
 
 	valueIn.UserID = userID
+
+	// valueIn.UserID = `1c2be014-8880-4e33-aa94-6a3986253b0c`
+	// valueIn.Status = "PROCESSED"
+	// valueIn.Sum = "200"
+	// valueIn.Order = number
 
 	return valueIn, nil
 }
@@ -184,15 +187,19 @@ func updateOrder(ctx context.Context, cfg config.Config, data orderData) (string
 	defer tx.Rollback()
 
 	if data.Status == cfg.OrdersStatus.Processed {
+		sum, err := strconv.Atoi(data.Sum)
+		if err != nil {
+			return "", err
+		}
 		textQuery := `UPDATE accum SET "sum" = $1, "status" = $2 WHERE "order" = $3`
-		_, err = tx.ExecContext(ctx, textQuery, data.Sum, data.Status, data.Order)
+		_, err = tx.ExecContext(ctx, textQuery, sum, data.Status, data.Order)
 
 		if err != nil {
 			return "", err
 		}
 
-		textQuery = `UPDATE users SET "balanse" = "balanse" + $1 WHERE "user" = $2`
-		_, err = tx.ExecContext(ctx, textQuery, data.Sum, data.UserID)
+		textQuery = `UPDATE users SET "balanse" = "balanse" + $1 WHERE "userID" = $2`
+		_, err = tx.ExecContext(ctx, textQuery, sum, data.UserID)
 		if err != nil {
 			return "", err
 		}
