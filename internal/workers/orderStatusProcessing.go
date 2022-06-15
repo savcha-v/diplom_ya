@@ -103,6 +103,8 @@ func getOrderData(ctx context.Context, cfg config.Config, number string) (orderD
 
 func getUserID(ctx context.Context, cfg config.Config, number string) (string, error) {
 
+	fmt.Fprintln(os.Stdout, "getUserID")
+
 	db := cfg.ConnectDB
 
 	textQuery := `SELECT "userID" FROM accum WHERE "order" = $1`
@@ -132,9 +134,11 @@ func getUserID(ctx context.Context, cfg config.Config, number string) (string, e
 
 func getOrdersProcessing(ctx context.Context, cfg config.Config) ([]string, error) {
 
+	fmt.Fprintln(os.Stdout, "getOrdersProcessing")
+
 	db := cfg.ConnectDB
 
-	textQuery := `SELECT "order", "userID"
+	textQuery := `SELECT "order"
 	FROM  accum 
 	where "status" = $1 or "status" = $2 or "status" = $3`
 
@@ -164,6 +168,8 @@ func getOrdersProcessing(ctx context.Context, cfg config.Config) ([]string, erro
 
 func updateOrder(ctx context.Context, cfg config.Config, data orderData) (string, error) {
 
+	fmt.Fprintln(os.Stdout, "updateOrder")
+
 	db := cfg.ConnectDB
 
 	mu := &sync.Mutex{}
@@ -177,16 +183,26 @@ func updateOrder(ctx context.Context, cfg config.Config, data orderData) (string
 	}
 	defer tx.Rollback()
 
-	textQuery := `UPDATE accum "sum" = $1, "status"=$2 WHERE "order" = $3`
-	_, err = tx.ExecContext(ctx, textQuery, data.Sum, data.Status, data.Order)
-	if err != nil {
-		return "", err
-	}
+	if data.Status == cfg.OrdersStatus.Processed {
+		textQuery := `UPDATE accum SET "sum" = $1, "status" = $2 WHERE "order" = $3`
+		_, err = tx.ExecContext(ctx, textQuery, data.Sum, data.Status, data.Order)
 
-	textQuery = `UPDATE users SET "balanse" = "balanse" + $1 WHERE "user" = $2`
-	_, err = tx.ExecContext(ctx, textQuery, data.Sum, data.UserID)
-	if err != nil {
-		return "", err
+		if err != nil {
+			return "", err
+		}
+
+		textQuery = `UPDATE users SET "balanse" = "balanse" + $1 WHERE "user" = $2`
+		_, err = tx.ExecContext(ctx, textQuery, data.Sum, data.UserID)
+		if err != nil {
+			return "", err
+		}
+
+	} else {
+		textQuery := `UPDATE accum SET "status" = $2 WHERE "order" = $3`
+		_, err = tx.ExecContext(ctx, textQuery, data.Status, data.Order)
+		if err != nil {
+			return "", err
+		}
 	}
 
 	tx.Commit()

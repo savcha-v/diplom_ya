@@ -206,8 +206,7 @@ func getOrders(cfg config.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		fmt.Fprintln(os.Stdout, "getOrders")
-
-		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 
 		userID := cookie.GetCookie(r, cfg, "userID")
 
@@ -227,7 +226,7 @@ func getOrders(cfg config.Config) http.HandlerFunc {
 			http.Error(w, "marshal error", http.StatusInternalServerError)
 			return
 		}
-
+		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		w.Write(result)
 		fmt.Fprint(w)
