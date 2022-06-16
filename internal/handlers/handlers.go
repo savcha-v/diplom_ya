@@ -207,7 +207,6 @@ func getOrders(cfg config.Config) http.HandlerFunc {
 		userID := cookie.GetCookie(r, cfg, "userID")
 
 		valueOut, err := store.GetAccum(r.Context(), cfg, userID)
-		fmt.Fprintln(os.Stdout, err)
 		if err != nil {
 			http.Error(w, "getOrders/ data base error", http.StatusInternalServerError)
 			return
@@ -239,12 +238,9 @@ func postWithdraw(cfg config.Config) http.HandlerFunc {
 		body, err := io.ReadAll(r.Body)
 		defer r.Body.Close()
 		if err != nil {
-			fmt.Fprintln(os.Stdout, "postWithdraw/ err:")
-			fmt.Fprintln(os.Stdout, err)
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-		fmt.Fprintln(os.Stdout, "postWithdraw/ body: "+string(body))
 
 		type in struct {
 			Order string  `json:"order"`

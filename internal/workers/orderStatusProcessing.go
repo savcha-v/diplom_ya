@@ -76,7 +76,7 @@ func getOrderData(ctx context.Context, cfg config.Config, number string) (orderD
 	}
 
 	if r.StatusCode == http.StatusTooManyRequests {
-		fmt.Fprintln(os.Stdout, "StatusTooManyRequests")
+
 		retryHead := r.Header.Get("Retry-After")
 		if retryHead != "" {
 			retry, err := strconv.Atoi(retryHead)
@@ -93,8 +93,6 @@ func getOrderData(ctx context.Context, cfg config.Config, number string) (orderD
 	if err != nil {
 		return valueIn, errors.New("error read body /api/orders/")
 	}
-
-	fmt.Fprintln(os.Stdout, "getOrderData/ body"+string(body))
 
 	defer r.Body.Close()
 
