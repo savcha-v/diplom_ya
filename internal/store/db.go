@@ -218,8 +218,6 @@ func WriteWithdraw(ctx context.Context, cfg config.Config, order string, sum flo
 
 	balance, _, err := GetBalanseSpent(ctx, cfg, userID)
 	if err != nil {
-		fmt.Fprintln(os.Stdout, "WriteWithdraw/ err GetBalanseSpent")
-		fmt.Fprintln(os.Stdout, err)
 		return http.StatusInternalServerError
 	}
 
@@ -238,7 +236,7 @@ func WriteWithdraw(ctx context.Context, cfg config.Config, order string, sum flo
 	textInsert := `
 		INSERT INTO subtract ("userID", "order", "sum", "date")
 		VALUES ($1, $2, $3, $4)`
-	_, err = db.ExecContext(ctx, textInsert, userID, order, sum, time.Now())
+	_, err = db.ExecContext(ctx, textInsert, userID, order, balance-sum, time.Now())
 
 	if err != nil {
 		fmt.Fprintln(os.Stdout, "WriteWithdraw/ err INSERT INTO subtract")
