@@ -15,6 +15,7 @@ func CheckAuthorized(cfg config.Config) func(http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 			// получим куки для идентификации пользователя
+			w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 
 			userID := cookie.GetCookie(r, cfg, "userID")
 			if userID == "" {
