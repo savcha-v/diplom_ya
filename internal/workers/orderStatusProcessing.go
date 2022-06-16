@@ -14,9 +14,9 @@ import (
 )
 
 type orderData struct {
-	Order  string `json:"order"`
-	Status string `json:"status"`
-	Sum    int    `json:"accrual"`
+	Order  string  `json:"order"`
+	Status string  `json:"status"`
+	Sum    float32 `json:"accrual"`
 	UserID string
 }
 
