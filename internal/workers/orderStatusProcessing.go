@@ -44,11 +44,15 @@ func ReadOrderProcessing(ctx context.Context, cfg config.Config) {
 		orderData, err := getOrderData(ctx, cfg, number)
 		if err != nil {
 			log.Println(err)
+			AddOrderToChannelProc(cfg, number)
+			return
 		}
 
 		status, err := updateOrder(ctx, cfg, orderData)
 		if err != nil {
 			log.Println(err)
+			AddOrderToChannelProc(cfg, number)
+			return
 		}
 
 		// если не в конечном статусе
@@ -71,6 +75,19 @@ func getOrderData(ctx context.Context, cfg config.Config, number string) (orderD
 		return valueIn, errors.New("error call /api/orders/")
 	}
 
+	if r.StatusCode == http.StatusTooManyRequests {
+		retryHead := r.Header.Get("Retry-After")
+		if retryHead != "" {
+			retry, err := strconv.Atoi(retryHead)
+			if err != nil {
+				return valueIn, errors.New("error conv Retry-After /api/orders/")
+			}
+			time.Sleep(time.Duration(retry) * time.Second)
+
+			return valueIn, errors.New("getOrderData/ wait retry /api/orders/")
+		}
+	}
+
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		return valueIn, errors.New("error read body /api/orders/")
@@ -83,17 +100,6 @@ func getOrderData(ctx context.Context, cfg config.Config, number string) (orderD
 
 	if valueIn.Order == "" {
 		return valueIn, errors.New("error unmarshal valueIn.Order is empty /api/orders/")
-	}
-
-	if r.StatusCode == http.StatusTooManyRequests {
-		retryHead := r.Header.Get("Retry-After")
-		if retryHead != "" {
-			retry, err := strconv.Atoi(retryHead)
-			if err != nil {
-				return valueIn, errors.New("error conv Retry-After /api/orders/")
-			}
-			time.Sleep(time.Duration(retry) * time.Second)
-		}
 	}
 
 	userID, err := getUserID(ctx, cfg, number)
