@@ -216,6 +216,14 @@ func WriteWithdraw(ctx context.Context, cfg config.Config, order string, sum flo
 	mu.Lock()
 	defer mu.Unlock()
 
+	db := cfg.ConnectDB
+
+	tx, err := db.Begin()
+	if err != nil {
+		return http.StatusInternalServerError
+	}
+	defer tx.Rollback()
+
 	balance, _, err := GetBalanseSpent(ctx, cfg, userID)
 	if err != nil {
 		return http.StatusInternalServerError
@@ -230,19 +238,29 @@ func WriteWithdraw(ctx context.Context, cfg config.Config, order string, sum flo
 		return http.StatusPaymentRequired
 	}
 
-	db := cfg.ConnectDB
-
 	// add in db
 	textInsert := `
 		INSERT INTO subtract ("userID", "order", "sum", "date")
 		VALUES ($1, $2, $3, $4)`
-	_, err = db.ExecContext(ctx, textInsert, userID, order, balance-sum, time.Now())
+	_, err = db.ExecContext(ctx, textInsert, userID, order, sum, time.Now())
 
 	if err != nil {
 		fmt.Fprintln(os.Stdout, "WriteWithdraw/ err INSERT INTO subtract")
 		fmt.Fprintln(os.Stdout, err)
 		return http.StatusInternalServerError
 	}
+
+	textInsert = `
+		UPDATE users set "balanse" = "balanse" - $1 where "userID" = $2`
+	_, err = db.ExecContext(ctx, textInsert, sum, userID)
+	if err != nil {
+		fmt.Fprintln(os.Stdout, "WriteWithdraw/ err INSERT INTO balanse")
+		fmt.Fprintln(os.Stdout, err)
+		return http.StatusInternalServerError
+	}
+
+	tx.Commit()
+
 	return http.StatusOK
 }
 
