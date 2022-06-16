@@ -8,6 +8,7 @@ import (
 	"diplom_ya/internal/store"
 	"fmt"
 	"net/http"
+	"os"
 )
 
 func CheckAuthorized(cfg config.Config) func(http.Handler) http.Handler {
@@ -16,26 +17,24 @@ func CheckAuthorized(cfg config.Config) func(http.Handler) http.Handler {
 
 			// получим куки для идентификации пользователя
 			w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+			fmt.Fprintln(os.Stdout, "CheckAuthorized")
 
 			userID := cookie.GetCookie(r, cfg, "userID")
 			if userID == "" {
 				// no cookie
-				fmt.Println("user not authorized0")
-				http.Error(w, "user not authorized", http.StatusUnauthorized)
+				http.Error(w, "CheckAuth/ userID no cookie", http.StatusUnauthorized)
 				return
 			}
 
 			exist, err := store.ExistsUserID(r.Context(), cfg, userID)
 			if err != nil {
 				// error server
-				fmt.Println("data base err")
-				http.Error(w, "data base err", http.StatusInternalServerError)
+				http.Error(w, "CheckAuth/ data base err", http.StatusInternalServerError)
 				return
 			}
 			if !exist {
 				// no in data base
-				fmt.Println("user not authorized1")
-				http.Error(w, "user not authorized", http.StatusUnauthorized)
+				http.Error(w, "CheckAuth/ user not authorized", http.StatusUnauthorized)
 				return
 			}
 

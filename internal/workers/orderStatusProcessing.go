@@ -209,7 +209,7 @@ func updateOrder(ctx context.Context, cfg config.Config, data orderData) (string
 		}
 
 	} else {
-		textQuery := `UPDATE accum SET "status" = $2 WHERE "order" = $3`
+		textQuery := `UPDATE accum SET "status" = $1 WHERE "order" = $2`
 		_, err = tx.ExecContext(ctx, textQuery, data.Status, data.Order)
 		if err != nil {
 			return "", err

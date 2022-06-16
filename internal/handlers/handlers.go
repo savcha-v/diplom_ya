@@ -212,20 +212,21 @@ func getOrders(cfg config.Config) http.HandlerFunc {
 
 		valueOut, err := store.GetAccum(r.Context(), cfg, userID)
 		if err != nil {
-			http.Error(w, "data base error", http.StatusInternalServerError)
+			http.Error(w, "getOrders/ data base error", http.StatusInternalServerError)
 			return
 		}
 
 		if len(valueOut) == 0 {
-			http.Error(w, "no orders", http.StatusNoContent)
+			http.Error(w, "getOrders/ no orders", http.StatusNoContent)
 			return
 		}
 
 		result, err := json.Marshal(valueOut)
 		if err != nil {
-			http.Error(w, "marshal error", http.StatusInternalServerError)
+			http.Error(w, "getOrders/ marshal error", http.StatusInternalServerError)
 			return
 		}
+
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		w.Write(result)
