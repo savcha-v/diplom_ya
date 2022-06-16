@@ -6,9 +6,7 @@ import (
 	"diplom_ya/internal/cookie"
 	"diplom_ya/internal/encryption"
 	"diplom_ya/internal/store"
-	"fmt"
 	"net/http"
-	"os"
 )
 
 func CheckAuthorized(cfg config.Config) func(http.Handler) http.Handler {
@@ -17,7 +15,6 @@ func CheckAuthorized(cfg config.Config) func(http.Handler) http.Handler {
 
 			// получим куки для идентификации пользователя
 			w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-			fmt.Fprintln(os.Stdout, "CheckAuthorized")
 
 			userID := cookie.GetCookie(r, cfg, "userID")
 			if userID == "" {
