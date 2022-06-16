@@ -38,8 +38,6 @@ func NewRouter(cfg config.Config) *chi.Mux {
 func userRegister(cfg config.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		fmt.Fprintln(os.Stdout, "userRegister")
-
 		body, err := io.ReadAll(r.Body)
 		defer r.Body.Close()
 		if err != nil {
@@ -86,8 +84,6 @@ func userRegister(cfg config.Config) http.HandlerFunc {
 
 func userLogin(cfg config.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
-		fmt.Fprintln(os.Stdout, "userLogin")
 
 		body, err := io.ReadAll(r.Body)
 		defer r.Body.Close()

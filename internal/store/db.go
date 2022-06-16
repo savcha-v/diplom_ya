@@ -237,7 +237,7 @@ func WriteWithdraw(ctx context.Context, cfg config.Config, order string, sum flo
 	// add in db
 	textInsert := `
 		INSERT INTO subtract ("userID", "order", "sum", "date")
-		VALUES ($1, $2, $3, $4, $5)`
+		VALUES ($1, $2, $3, $4)`
 	_, err = db.ExecContext(ctx, textInsert, userID, order, sum, time.Now())
 
 	if err != nil {
