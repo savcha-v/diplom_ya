@@ -5,9 +5,7 @@ import (
 	"database/sql"
 	"diplom_ya/internal/config"
 	"diplom_ya/internal/workers"
-	"fmt"
 	"net/http"
-	"os"
 	"sync"
 	"time"
 
@@ -229,11 +227,6 @@ func WriteWithdraw(ctx context.Context, cfg config.Config, order string, sum flo
 		return http.StatusInternalServerError
 	}
 
-	fmt.Fprintln(os.Stdout, "WriteWithdraw/ balance")
-	fmt.Fprintln(os.Stdout, balance)
-	fmt.Fprintln(os.Stdout, "WriteWithdraw/ sum")
-	fmt.Fprintln(os.Stdout, sum)
-
 	if balance < sum {
 		return http.StatusPaymentRequired
 	}
@@ -245,8 +238,6 @@ func WriteWithdraw(ctx context.Context, cfg config.Config, order string, sum flo
 	_, err = db.ExecContext(ctx, textInsert, userID, order, sum, time.Now())
 
 	if err != nil {
-		fmt.Fprintln(os.Stdout, "WriteWithdraw/ err INSERT INTO subtract")
-		fmt.Fprintln(os.Stdout, err)
 		return http.StatusInternalServerError
 	}
 
@@ -254,8 +245,6 @@ func WriteWithdraw(ctx context.Context, cfg config.Config, order string, sum flo
 		UPDATE users set "balanse" = "balanse" - $1 where "userID" = $2`
 	_, err = db.ExecContext(ctx, textInsert, sum, userID)
 	if err != nil {
-		fmt.Fprintln(os.Stdout, "WriteWithdraw/ err INSERT INTO balanse")
-		fmt.Fprintln(os.Stdout, err)
 		return http.StatusInternalServerError
 	}
 

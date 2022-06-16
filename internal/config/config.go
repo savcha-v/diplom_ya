@@ -66,7 +66,7 @@ func New() Config {
 
 	cfg.OrdersStatus = statuses
 
-	cfg.ChanOrdersProc = make(chan string, 100)
+	cfg.ChanOrdersProc = make(chan string)
 
 	return cfg
 }
