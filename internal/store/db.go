@@ -197,7 +197,7 @@ func GetAccum(ctx context.Context, cfg config.Config, userID string) ([]config.O
 
 	for rows.Next() {
 		var item config.OutAccum
-		err = rows.Scan(&item.Order, &item.Sum, &item.Date, item.Status)
+		err = rows.Scan(&item.Order, &item.Sum, &item.Date, &item.Status)
 		if err != nil {
 			return nil, err
 		}
