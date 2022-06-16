@@ -132,8 +132,8 @@ func getBalance(cfg config.Config) http.HandlerFunc {
 		fmt.Fprintln(os.Stdout, "getBalance")
 
 		type out struct {
-			Balanse  int `json:"current"`
-			SumSpent int `json:"withdrawn"`
+			Balanse  float32 `json:"current"`
+			SumSpent float32 `json:"withdrawn"`
 		}
 
 		userID := cookie.GetCookie(r, cfg, "userID")
@@ -243,13 +243,16 @@ func postWithdraw(cfg config.Config) http.HandlerFunc {
 		body, err := io.ReadAll(r.Body)
 		defer r.Body.Close()
 		if err != nil {
+			fmt.Fprintln(os.Stdout, "postWithdraw/ err:")
+			fmt.Fprintln(os.Stdout, err)
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
+		fmt.Fprintln(os.Stdout, "postWithdraw/ body: "+string(body))
 
 		type in struct {
-			Order string `json:"order"`
-			Sum   int    `json:"sum"`
+			Order string  `json:"order"`
+			Sum   float32 `json:"sum"`
 		}
 
 		valueIn := in{}

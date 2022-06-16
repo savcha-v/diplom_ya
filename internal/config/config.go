@@ -30,13 +30,13 @@ type OrdersStatus struct {
 type OutAccum struct {
 	Order  string    `json:"number"`
 	Status string    `json:"status"`
-	Sum    int       `json:"accrual,omitempty"`
+	Sum    float32   `json:"accrual,omitempty"`
 	Date   time.Time `json:"uploaded_at"`
 }
 
 type OutWithdrawals struct {
 	Order string    `json:"order"`
-	Sum   int       `json:"accrual"`
+	Sum   float32   `json:"accrual"`
 	Date  time.Time `json:"processed_at"`
 }
 

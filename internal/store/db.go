@@ -127,7 +127,7 @@ func ExistsUserID(ctx context.Context, cfg config.Config, userID string) (bool, 
 	}
 }
 
-func GetBalanseSpent(ctx context.Context, cfg config.Config, userID string) (balance int, spent int, err error) {
+func GetBalanseSpent(ctx context.Context, cfg config.Config, userID string) (balance float32, spent float32, err error) {
 
 	db := cfg.ConnectDB
 
@@ -208,7 +208,7 @@ func GetAccum(ctx context.Context, cfg config.Config, userID string) ([]config.O
 	return out, err
 }
 
-func WriteWithdraw(ctx context.Context, cfg config.Config, order string, sum int, userID string) int {
+func WriteWithdraw(ctx context.Context, cfg config.Config, order string, sum float32, userID string) int {
 
 	mu := &sync.Mutex{}
 	mu.Lock()
