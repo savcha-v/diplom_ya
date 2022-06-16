@@ -211,6 +211,7 @@ func getOrders(cfg config.Config) http.HandlerFunc {
 		userID := cookie.GetCookie(r, cfg, "userID")
 
 		valueOut, err := store.GetAccum(r.Context(), cfg, userID)
+		fmt.Fprintln(os.Stdout, err)
 		if err != nil {
 			http.Error(w, "getOrders/ data base error", http.StatusInternalServerError)
 			return
