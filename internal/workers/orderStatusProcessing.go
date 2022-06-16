@@ -50,9 +50,10 @@ func ReadOrderProcessing(ctx context.Context, cfg config.Config) {
 		if err != nil {
 			log.Println(err)
 		}
+
 		// если не в конечном статусе
 		if status != cfg.OrdersStatus.Processed && status != cfg.OrdersStatus.Invalid {
-			AddOrderToChannelProc(cfg, number)
+			go AddOrderToChannelProc(cfg, number)
 		}
 
 	}
