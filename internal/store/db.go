@@ -25,7 +25,7 @@ func DBInit(cfg *config.Config) error {
 		"userID" TEXT,
 		"login" TEXT PRIMARY KEY,
 		"hash" TEXT,
-		"balanse" INTEGER
+		"balanse" FLOAT 
 		 );`
 	if _, err := db.Exec(textCreate); err != nil {
 		return err
@@ -34,7 +34,7 @@ func DBInit(cfg *config.Config) error {
 	textCreate = `CREATE TABLE IF NOT EXISTS accum(
 		"userID" TEXT,
 		"order" TEXT PRIMARY KEY,
-		"sum" INTEGER,
+		"sum" FLOAT,
 		"date" DATE,
 		"status" TEXT
 		 );`
@@ -45,7 +45,7 @@ func DBInit(cfg *config.Config) error {
 	textCreate = `CREATE TABLE IF NOT EXISTS subtract(
 		"userID" TEXT,
 		"order" TEXT PRIMARY KEY,
-		"sum" INTEGER,
+		"sum" FLOAT,
 		"date" DATE
 		 );`
 	if _, err := db.Exec(textCreate); err != nil {
