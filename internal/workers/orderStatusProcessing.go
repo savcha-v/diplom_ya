@@ -10,9 +10,7 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strconv"
 	"sync"
-	"time"
 )
 
 type orderData struct {
@@ -75,26 +73,28 @@ func getOrderData(ctx context.Context, cfg config.Config, number string) (orderD
 		return valueIn, errors.New("error call /api/orders/")
 	}
 
-	if r.StatusCode == http.StatusTooManyRequests {
-		fmt.Fprintln(os.Stdout, "StatusTooManyRequests")
-		retryHead := r.Header.Get("Retry-After")
-		if retryHead != "" {
-			retry, err := strconv.Atoi(retryHead)
-			if err != nil {
-				return valueIn, errors.New("error conv Retry-After /api/orders/")
-			}
-			time.Sleep(time.Duration(retry) * time.Second)
+	// if r.StatusCode == http.StatusTooManyRequests {
+	// 	fmt.Fprintln(os.Stdout, "StatusTooManyRequests")
+	// 	retryHead := r.Header.Get("Retry-After")
+	// 	if retryHead != "" {
+	// 		retry, err := strconv.Atoi(retryHead)
+	// 		if err != nil {
+	// 			return valueIn, errors.New("error conv Retry-After /api/orders/")
+	// 		}
+	// 		time.Sleep(time.Duration(retry) * time.Second)
 
-			return valueIn, errors.New("getOrderData/ wait retry /api/orders/")
-		}
-	}
+	// 		return valueIn, errors.New("getOrderData/ wait retry /api/orders/")
+	// 	}
+	// }
 
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		fmt.Fprintln(os.Stdout, err)
 		return valueIn, errors.New("error read body /api/orders/")
 	}
-	fmt.Fprintln(os.Stdout, body)
+
+	fmt.Fprintln(os.Stdout, "getOrderData/ body")
+	fmt.Fprintln(os.Stdout, string(body))
 	defer r.Body.Close()
 
 	if err := json.Unmarshal(body, &valueIn); err != nil {
